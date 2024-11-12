@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_train_app/pages/booking_complete_page.dart';
 
 class SeatPage extends StatefulWidget {
   final String departureStation;
@@ -143,8 +144,18 @@ class _SeatPageState extends State<SeatPage> {
           CupertinoDialogAction(
             child: const Text('확인'),
             onPressed: () {
+              Navigator.pop(context);
               widget.onBookingComplete();
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookingCompletePage(
+                    departureStation: widget.departureStation,
+                    arrivalStation: widget.arrivalStation,
+                    selectedSeats: selectedSeats,
+                  ),
+                ),
+              );
             },
           ),
         ],
