@@ -14,10 +14,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '기차 예매',
       theme: ThemeData(
+        brightness: Brightness.light,
+        primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: Colors.grey[200],
         appBarTheme: const AppBarTheme(
           centerTitle: true,
         ),
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.purple,
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+        ),
+      ),
+      themeMode: ThemeMode.system, // 시스템 설정에 따라 테마 변경
       home: const HomePage(),
     );
   }
@@ -41,10 +52,10 @@ class _HomePageState extends State<HomePage> {
       MaterialPageRoute(
         builder: (context) => StationListPage(
           title: isDeparture ? '출발역' : '도착역',
+          excludeStation: isDeparture ? arrivalStation : departureStation,
         ),
       ),
     );
-
     if (result != null) {
       setState(() {
         if (isDeparture) {
@@ -59,7 +70,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('기차 예매'),
       ),
@@ -71,7 +81,9 @@ class _HomePageState extends State<HomePage> {
             Container(
               height: 200,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[800]
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -186,24 +198,29 @@ class StationListPage extends StatelessWidget {
     "울산",
     "부산"
   ];
+  final String? excludeStation;
 
-  StationListPage({super.key, required this.title});
+  StationListPage({super.key, required this.title, this.excludeStation});
 
   @override
   Widget build(BuildContext context) {
+    final filteredStations =
+        stations.where((station) => station != excludeStation).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
       body: ListView.builder(
-        itemCount: stations.length,
+        itemCount: filteredStations.length,
         itemBuilder: (context, index) {
           return InkWell(
             onTap: () {
-              Navigator.pop(context, stations[index]);
+              Navigator.pop(context, filteredStations[index]);
             },
             child: Container(
               height: 50,
+              alignment: Alignment.centerLeft,
               decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: Colors.grey[300]!),
@@ -212,7 +229,7 @@ class StationListPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  stations[index],
+                  filteredStations[index],
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -284,7 +301,9 @@ class _SeatPageState extends State<SeatPage> {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300],
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey[800]
+                      : Colors.grey[300],
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -313,7 +332,9 @@ class _SeatPageState extends State<SeatPage> {
                 decoration: BoxDecoration(
                   color: selectedSeats.contains(seatId)
                       ? Colors.purple
-                      : Colors.grey[300],
+                      : Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -344,7 +365,9 @@ class _SeatPageState extends State<SeatPage> {
                 decoration: BoxDecoration(
                   color: selectedSeats.contains(seatId)
                       ? Colors.purple
-                      : Colors.grey[300],
+                      : Theme.of(context).brightness == Brightness.dark
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
