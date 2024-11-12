@@ -13,6 +13,13 @@ class _HomePageState extends State<HomePage> {
   String? departureStation;
   String? arrivalStation;
 
+  void _resetStations() {
+    setState(() {
+      departureStation = null;
+      arrivalStation = null;
+    });
+  }
+
   Future<void> _selectStation(bool isDeparture) async {
     final result = await Navigator.push(
       context,
@@ -72,11 +79,13 @@ class _HomePageState extends State<HomePage> {
           builder: (context) => SeatPage(
             departureStation: departureStation!,
             arrivalStation: arrivalStation!,
+            onBookingComplete: _resetStations, 
           ),
         ),
       );
     }
   }
+
 }
 
 class StationSelector extends StatelessWidget {

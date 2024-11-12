@@ -4,11 +4,13 @@ import 'package:flutter/cupertino.dart';
 class SeatPage extends StatefulWidget {
   final String departureStation;
   final String arrivalStation;
+  final VoidCallback onBookingComplete;
 
   const SeatPage({
     super.key,
     required this.departureStation,
     required this.arrivalStation,
+    required this.onBookingComplete,
   });
 
   @override
@@ -141,6 +143,7 @@ class _SeatPageState extends State<SeatPage> {
           CupertinoDialogAction(
             child: const Text('확인'),
             onPressed: () {
+              widget.onBookingComplete();
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),
