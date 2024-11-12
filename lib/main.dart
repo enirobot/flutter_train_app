@@ -1,4 +1,6 @@
+// main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,119 +9,473 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '기차 예매',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+// home_page.dart
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomePageState extends State<HomePage> {
+  String? departureStation;
+  String? arrivalStation;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  Future<void> _selectStation(bool isDeparture) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => StationListPage(
+          title: isDeparture ? '출발역' : '도착역',
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        if (isDeparture) {
+          departureStation = result;
+        } else {
+          arrivalStation = result;
+        }
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('기차 예매'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            Container(
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _selectStation(true),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '출발역',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            departureStation ?? '선택',
+                            style: const TextStyle(fontSize: 40),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 2,
+                    height: 50,
+                    color: Colors.grey[400],
+                  ),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _selectStation(false),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            '도착역',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            arrivalStation ?? '선택',
+                            style: const TextStyle(fontSize: 40),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: (departureStation != null && arrivalStation != null)
+                    ? () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SeatPage(
+                              departureStation: departureStation!,
+                              arrivalStation: arrivalStation!,
+                            ),
+                          ),
+                        );
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  backgroundColor: Colors.purple,
+                ),
+                child: const Text(
+                  '좌석 선택',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+// station_list_page.dart
+class StationListPage extends StatelessWidget {
+  final String title;
+  final List<String> stations = [
+    "수서",
+    "동탄",
+    "평택지제",
+    "천안아산",
+    "오송",
+    "대전",
+    "김천구미",
+    "동대구",
+    "경주",
+    "울산",
+    "부산"
+  ];
+
+  StationListPage({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: ListView.builder(
+        itemCount: stations.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () {
+              Navigator.pop(context, stations[index]);
+            },
+            child: Container(
+              height: 50,
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey[300]!),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  stations[index],
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// seat_page.dart
+class SeatPage extends StatefulWidget {
+  final String departureStation;
+  final String arrivalStation;
+
+  const SeatPage({
+    super.key,
+    required this.departureStation,
+    required this.arrivalStation,
+  });
+
+  @override
+  State<SeatPage> createState() => _SeatPageState();
+}
+
+class _SeatPageState extends State<SeatPage> {
+  final Set<String> selectedSeats = {};
+
+  void _toggleSeat(String seatId) {
+    setState(() {
+      if (selectedSeats.contains(seatId)) {
+        selectedSeats.remove(seatId);
+      } else {
+        selectedSeats.add(seatId);
+      }
+    });
+  }
+
+  Widget _buildSeatLegend() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.purple,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Text('선택됨'),
+            ],
+          ),
+        ),
+        const SizedBox(width: 20),
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Text('선택안됨'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSeatRow(int rowNumber) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ...['A', 'B'].map((seat) {
+          final seatId = '$rowNumber$seat';
+          return GestureDetector(
+            onTap: () => _toggleSeat(seatId),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: selectedSeats.contains(seatId)
+                      ? Colors.purple
+                      : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          );
+        }),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: Container(
+            width: 50,
+            height: 50,
+            alignment: Alignment.center,
+            child: Text(
+              '$rowNumber',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ),
+        ),
+        ...['C', 'D'].map((seat) {
+          final seatId = '$rowNumber$seat';
+          return GestureDetector(
+            onTap: () => _toggleSeat(seatId),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: selectedSeats.contains(seatId)
+                      ? Colors.purple
+                      : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  void _showBookingConfirmation() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('예매 확인'),
+        content: Text(
+          '선택하신 ${selectedSeats.join(", ")} 좌석을 예매하시겠습니까?',
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('취소'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          CupertinoDialogAction(
+            child: const Text('확인'),
+            onPressed: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('좌석 선택'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    widget.departureStation,
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const Icon(
+                  Icons.arrow_circle_right_outlined,
+                  size: 30,
+                ),
+                Expanded(
+                  child: Text(
+                    widget.arrivalStation,
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _buildSeatLegend(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: ['A', 'B', '', 'C', 'D'].map((label) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      label,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: 20,
+                itemBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: _buildSeatRow(index + 1)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed:
+                      selectedSeats.isEmpty ? null : _showBookingConfirmation,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    backgroundColor: Colors.purple,
+                  ),
+                  child: const Text(
+                    '예매 하기',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
